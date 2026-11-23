@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 590" role="img" aria-labelledby="title desc">
+<title id="title">不平衡三相回路のY-Δ変換</title><desc id="desc">端子a、b、cのY形回路と等価なΔ形回路の比較図</desc>
+<rect width="900" height="590" rx="24" fill="white"/>
+<g font-family="Arial,'Hiragino Kaku Gothic ProN',sans-serif" fill="#172235">
+<text x="450" y="66" text-anchor="middle" font-size="36" font-weight="700">不平衡三相回路のY-Δ変換</text>
+<text x="235" y="558" font-size="23" text-anchor="middle">Y（スター）結線</text>
+<text x="690" y="558" font-size="23" text-anchor="middle">Δ（デルタ）結線</text>
+</g>
+<g stroke="#172235" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round">
+<path d="M235 145V325 M235 325L92 465 M235 325L378 465"/>
+<rect x="218" y="210" width="34" height="64" fill="#eaf3fb"/>
+<g transform="rotate(45 162 398)"><rect x="145" y="366" width="34" height="64" fill="#eaf3fb"/></g>
+<g transform="rotate(-45 308 398)"><rect x="291" y="366" width="34" height="64" fill="#eaf3fb"/></g>
+<circle cx="235" cy="145" r="10" fill="#fff"/><circle cx="235" cy="325" r="8" fill="#172235"/>
+<circle cx="92" cy="465" r="10" fill="#fff"/><circle cx="378" cy="465" r="10" fill="#fff"/>
+<path d="M437 322H515"/><path d="M495 301L520 322L495 343" fill="#172235"/>
+<path d="M690 145L560 465H820Z"/>
+<g transform="rotate(22 624 312)"><rect x="607" y="280" width="34" height="64" fill="#eaf3fb"/></g>
+<g transform="rotate(-22 756 312)"><rect x="739" y="280" width="34" height="64" fill="#eaf3fb"/></g>
+<rect x="660" y="448" width="60" height="34" fill="#eaf3fb"/>
+<circle cx="690" cy="145" r="10" fill="#fff"/><circle cx="560" cy="465" r="10" fill="#fff"/><circle cx="820" cy="465" r="10" fill="#fff"/>
+</g>
+<g font-size="31" font-family="Georgia,'Times New Roman',serif" fill="#172235">
+<text x="235" y="122" text-anchor="middle">a</text><text x="79" y="505">c</text><text x="385" y="505">b</text><text x="247" y="314">O</text>
+<text x="263" y="248">Z<tspan baseline-shift="sub" font-size="19">a</tspan></text>
+<text x="101" y="360">Z<tspan baseline-shift="sub" font-size="19">c</tspan></text>
+<text x="332" y="360">Z<tspan baseline-shift="sub" font-size="19">b</tspan></text>
+<text x="690" y="122" text-anchor="middle">a</text><text x="543" y="507">c</text><text x="824" y="507">b</text>
+<text x="776" y="295">Z<tspan baseline-shift="sub" font-size="19">ab</tspan></text>
+<text x="549" y="295">Z<tspan baseline-shift="sub" font-size="19">ca</tspan></text>
+<text x="682" y="518" text-anchor="middle">Z<tspan baseline-shift="sub" font-size="19">bc</tspan></text>
+</g>
+</svg>
