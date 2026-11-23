@@ -1,6 +1,8 @@
 {
-  "apiKey": "",
-  "authDomain": "",
-  "projectId": "",
-  "appId": ""
+  "apiKey": "AIzaSyCHiF7d7QSpKo3x08qw0SHvIXrgMyXxjc8",
+  "authDomain": "denken1-theory-sync.firebaseapp.com",
+  "projectId": "denken1-theory-sync",
+  "storageBucket": "denken1-theory-sync.firebasestorage.app",
+  "messagingSenderId": "1059783952179",
+  "appId": "1:1059783952179:web:adc6ea75802f250327a046"
 }
