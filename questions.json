@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 2,
+  "deckId": "denken1-theory",
+  "title": "電験一種 理論 デジタル単語帳",
+  "description": "出典のある過去問の解法論点から作成したカード。原題の全文再現ではない。",
+  "revision": "2026-11-23T17:03:00+09:00",
+  "nextId": 2,
+  "categories": [
+    "静電界・電位・静電容量",
+    "磁界・磁気回路・電磁誘導",
+    "直流回路・回路網定理",
+    "交流回路・三相交流・共振",
+    "過渡現象・ラプラス変換",
+    "電子回路・半導体",
+    "電気・電子計測"
+  ],
+  "cards": [
+    {
+      "id": "den1-001",
+      "section_no": 1,
+      "category": "交流回路・三相交流・共振",
+      "type": "公式暗記型",
+      "question": "Y結線の各相インピーダンスが Za、Zb、Zc で与えられている。等価なΔ結線に変換したとき、端子a-b間のインピーダンス Zab を求めよ。",
+      "image": "images/den1-001-y-delta.svg",
+      "imageAlt": "中心OからZa・Zb・Zcが伸びるY結線と、Zab・Zbc・Zcaからなる等価Δ結線の比較図。",
+      "answer": "Zab = (ZaZb + ZbZc + ZcZa) / Zc",
+      "answerLatex": "Z_{ab}=\\frac{Z_a Z_b+Z_b Z_c+Z_c Z_a}{Z_c}",
+      "explanation": "Y結線の3枝の積の和を、求めるΔ辺（a-b）に対向するY側の枝 Zc で割る。分母に Za や Zb を選ばないこと。",
+      "point": "抵抗だけでなく複素インピーダンスにも適用可能。Zabの分母はZc、Zbcの分母はZa、Zcaの分母はZb。",
+      "origin": "参考書『第2章 電気回路』p.144 問題11（平成29年度 電験一種二次・問5）の攻略ポイントから再構成（原題全文ではない）。",
+      "sourceType": "出典のある問題からの論点抽出"
+    }
+  ],
+  "archivedCards": [],
+  "retiredIds": []
+}
