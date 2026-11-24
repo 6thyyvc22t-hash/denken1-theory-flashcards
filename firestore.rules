@@ -26,7 +26,8 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
     }
-    // Per-account card overrides. These never modify the public questions.json.
+
+    // Individual card changes are private to the signed-in owner.
     match /users/{userId}/deckChanges/{cardId} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow create, update: if request.auth != null && request.auth.uid == userId
@@ -35,9 +36,12 @@ service cloud.firestore {
         && request.resource.data.keys().hasAll(['status','updatedAt'])
         && request.resource.data.status in ['active','archived','purged']
         && request.resource.data.updatedAt == request.time
-        && (request.resource.data.status == 'purged'
-          ? !('card' in request.resource.data)
-          : ('card' in request.resource.data
+        && (
+          (request.resource.data.status == 'purged'
+            && !('card' in request.resource.data))
+          ||
+          (request.resource.data.status in ['active','archived']
+            && ('card' in request.resource.data)
             && request.resource.data.card is map
             && request.resource.data.card.keys().hasOnly(['id','section_no','category','question','answer','explanation','point','origin','image','imageAlt','answerLatex','type','sourceType'])
             && request.resource.data.card.keys().hasAll(['id','section_no','category','question','answer','explanation','point','origin','image','imageAlt','answerLatex','type','sourceType'])
@@ -60,26 +64,6 @@ service cloud.firestore {
             && request.resource.data.card.origin.size() <= 1000
             && request.resource.data.card.image is string
             && request.resource.data.card.image.size() <= 200
-            && (request.resource.data.card.image == ''
-                || request.resource.data.card.image.matches('^images/[A-Za-z0-9._-]+[.](svg|png|jpg|jpeg|webp)
-      allow delete: if false;
-    }
-    match /users/{userId}/operations/{operationId} {
-      allow get: if request.auth != null && request.auth.uid == userId;
-      allow list: if false;
-      allow create: if request.auth != null && request.auth.uid == userId
-        && request.resource.data.keys().hasOnly(['cardId','kind','createdAt'])
-        && request.resource.data.cardId is string
-        && request.resource.data.cardId.matches('^[A-Za-z0-9_-]{1,64}$')
-        && request.resource.data.kind in ['correct','wrong']
-        && request.resource.data.createdAt is timestamp;
-      allow update, delete: if false;
-    }
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}))
             && request.resource.data.card.imageAlt is string
             && request.resource.data.card.imageAlt.size() <= 200
             && request.resource.data.card.answerLatex is string
@@ -87,7 +71,9 @@ service cloud.firestore {
             && request.resource.data.card.type is string
             && request.resource.data.card.type.size() <= 80
             && request.resource.data.card.sourceType is string
-            && request.resource.data.card.sourceType.size() <= 200));
+            && request.resource.data.card.sourceType.size() <= 200
+          )
+        );
       allow delete: if false;
     }
     match /users/{userId}/operations/{operationId} {
