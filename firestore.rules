@@ -26,6 +26,70 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
     }
+    // Per-account card overrides. These never modify the public questions.json.
+    match /users/{userId}/deckChanges/{cardId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create, update: if request.auth != null && request.auth.uid == userId
+        && cardId.matches('^[A-Za-z0-9_-]{1,64}$')
+        && request.resource.data.keys().hasOnly(['status','card','updatedAt'])
+        && request.resource.data.keys().hasAll(['status','updatedAt'])
+        && request.resource.data.status in ['active','archived','purged']
+        && request.resource.data.updatedAt == request.time
+        && (request.resource.data.status == 'purged'
+          ? !('card' in request.resource.data)
+          : ('card' in request.resource.data
+            && request.resource.data.card is map
+            && request.resource.data.card.keys().hasOnly(['id','section_no','category','question','answer','explanation','point','origin','image','imageAlt','answerLatex','type','sourceType'])
+            && request.resource.data.card.keys().hasAll(['id','section_no','category','question','answer','explanation','point','origin','image','imageAlt','answerLatex','type','sourceType'])
+            && request.resource.data.card.id == cardId
+            && request.resource.data.card.section_no is int
+            && request.resource.data.card.section_no >= 0
+            && request.resource.data.card.category is string
+            && request.resource.data.card.category in ['静電界・電位・静電容量','磁界・磁気回路・電磁誘導','直流回路・回路網定理','交流回路・三相交流・共振','過渡現象・ラプラス変換','電子回路・半導体','電気・電子計測']
+            && request.resource.data.card.question is string
+            && request.resource.data.card.question.size() > 0
+            && request.resource.data.card.question.size() <= 400
+            && request.resource.data.card.answer is string
+            && request.resource.data.card.answer.size() > 0
+            && request.resource.data.card.answer.size() <= 400
+            && request.resource.data.card.explanation is string
+            && request.resource.data.card.explanation.size() <= 600
+            && request.resource.data.card.point is string
+            && request.resource.data.card.point.size() <= 600
+            && request.resource.data.card.origin is string
+            && request.resource.data.card.origin.size() <= 1000
+            && request.resource.data.card.image is string
+            && request.resource.data.card.image.size() <= 200
+            && (request.resource.data.card.image == ''
+                || request.resource.data.card.image.matches('^images/[A-Za-z0-9._-]+[.](svg|png|jpg|jpeg|webp)
+      allow delete: if false;
+    }
+    match /users/{userId}/operations/{operationId} {
+      allow get: if request.auth != null && request.auth.uid == userId;
+      allow list: if false;
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['cardId','kind','createdAt'])
+        && request.resource.data.cardId is string
+        && request.resource.data.cardId.matches('^[A-Za-z0-9_-]{1,64}$')
+        && request.resource.data.kind in ['correct','wrong']
+        && request.resource.data.createdAt is timestamp;
+      allow update, delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}))
+            && request.resource.data.card.imageAlt is string
+            && request.resource.data.card.imageAlt.size() <= 200
+            && request.resource.data.card.answerLatex is string
+            && request.resource.data.card.answerLatex.size() <= 2000
+            && request.resource.data.card.type is string
+            && request.resource.data.card.type.size() <= 80
+            && request.resource.data.card.sourceType is string
+            && request.resource.data.card.sourceType.size() <= 200));
+      allow delete: if false;
+    }
     match /users/{userId}/operations/{operationId} {
       allow get: if request.auth != null && request.auth.uid == userId;
       allow list: if false;
