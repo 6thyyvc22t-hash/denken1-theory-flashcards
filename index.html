@@ -4,18 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="color-scheme" content="dark">
-  <title>電験一種 理論｜デジタル単語帳</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>電験一種 理論｜図付きデジタル単語帳</title>
+  <link rel="stylesheet" href="styles.css?v=den1-20261125-personaldeck">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" async></script>
-  <script src="app.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" defer></script>
+  <script src="app.js?v=den1-20261125-personaldeck" defer></script>
 </head>
 <body>
 <main class="page">
   <header class="hero">
     <p class="eyebrow">電験一種一次試験・理論</p>
     <div class="heroRow"><h1>デジタル単語帳</h1><span class="heroCount" id="deckCount">準備中</span></div>
-    <p class="muted">問題の追加・編集・削除・復元に対応。学習記録は問題IDごとに保持。Firebase認証でiPad・iPhone間の学習記録・メモの同期に対応。</p>
+    <p class="muted">問題の追加・編集・削除・復元に対応。学習記録は問題IDごとに保持。Firebase認証でiPad・iPhone間の学習記録・メモ・問題の変更を同期。</p>
   </header>
   <noscript><div class="alert error">JavaScriptが無効です。GitHub Pagesで公開したURLをSafariから開いてください。</div></noscript>
   <div id="loadError" class="alert error hidden" role="alert"></div>
@@ -25,6 +25,7 @@
   <section id="cloudPanel" class="panel cloudPanel" aria-label="Firebaseクラウド同期">
     <div class="cloudHeader"><strong><span id="cloudIndicator">◯</span> クラウド同期</strong><span id="cloudUser" class="small">未ログイン</span></div>
     <p class="small" id="cloudStatus" role="status">Firebase設定を確認中…</p>
+    <p class="small" id="deckCloudStatus" role="status">問題データのクラウド同期を確認中…</p>
     <div id="cloudAuthPanel" class="hidden">
       <label>メールアドレス<input id="authEmail" type="email" inputmode="email" autocomplete="username" placeholder="メールアドレス"></label>
       <label>パスワード<input id="authPassword" type="password" autocomplete="current-password" placeholder="6文字以上"></label>
@@ -32,8 +33,9 @@
       <p class="small">両端末で同じメールアドレスとパスワードを使用します。パスワードをサイトに保存しません。</p>
     </div>
     <div id="cloudUserPanel" class="hidden">
-      <div class="inlineActions"><button type="button" id="cloudLogout" class="quiet">ログアウト</button><button type="button" id="cloudMigrate" class="quiet hidden">この端末の以前の成績を移行</button><button type="button" id="cloudExportLegacy" class="quiet hidden">移行前の成績を保存</button><button type="button" id="cloudMigrateNotes" class="quiet hidden">端末メモを初回同期</button></div>
+      <div class="inlineActions"><button type="button" id="cloudLogout" class="quiet">ログアウト</button><button type="button" id="cloudMigrate" class="quiet hidden">この端末の以前の成績を移行</button><button type="button" id="cloudExportLegacy" class="quiet hidden">移行前の成績を保存</button><button type="button" id="cloudMigrateNotes" class="quiet hidden">端末メモを初回同期</button><button type="button" id="cloudMigrateDeck" class="quiet hidden">以前の端末下書きをクラウドへ移行</button></div>
       <p id="cloudMigrationInfo" class="small hidden"></p>
+      <p id="cloudDeckMigrationInfo" class="small hidden"></p>
     </div>
     <details id="cloudSetup" class="cloudSetup"><summary>Firebase設定（初回設定時のみ）</summary>
       <p class="small">Firebase管理画面で取得したWebアプリの設定JSONを入力します。設定はブラウザ内に保存されます。全端末で使うには <code>firebase-config.json</code> をGitHubに公開してください。APIキーは公開前提の識別情報ですが、データへのアクセスはFirestoreセキュリティルールで制限します。</p>
@@ -56,14 +58,19 @@
     <section class="controls panel" aria-label="出題条件">
       <label>出題分野<select id="categoryFilter"><option value="ALL">全分野</option></select></label>
       <label>出題方法<select id="modeFilter"><option value="ordered">順番に出題</option><option value="random">ランダム</option><option value="missed">間違えた問題のみ</option><option value="new">未学習のみ</option></select></label>
+      <div class="jumpGroup" id="jumpGroup">
+        <label for="jumpSelect">開始する問題を選ぶ</label>
+        <div class="jumpRow"><select id="jumpSelect" aria-describedby="jumpHelp"></select><button id="jumpBtn" type="button">ここから開始</button></div>
+        <p id="jumpHelp" class="small" role="status">現在の出題条件に合う問題から選択できます。</p>
+      </div>
     </section>
 
     <div class="questionHead"><span id="questionIndex">Q---</span><span id="progressText">0 / 0</span></div>
     <div class="progress"><div id="progressBar"></div></div>
     <article class="flash panel" id="card" tabindex="0" role="button" aria-label="カードをタップして答えを表示">
       <div class="topLine"><span class="chip" id="cardCategory">分野</span><span class="muted" id="cardSide">表面・問題</span></div>
-      <h2 id="questionText">Y結線の各相インピーダンスが Za、Zb、Zc で与えられている。等価なΔ結線に変換したとき、端子a-b間のインピーダンス Zab を求めよ。</h2>
-      <figure id="problemFigure" class="problemFigure"><img id="problemImage" src="images/den1-001-y-delta.svg" width="900" height="590" loading="eager" alt="Y結線のZa、Zb、Zcを、端子a、b、c間のΔ結線Zab、Zbc、Zcaに変換する回路図"><figcaption>Y結線からΔ結線への変換</figcaption></figure>
+      <h2 id="questionText">Y結線の各相インピーダンスZa、Zb、ZcをΔ結線に等価変換したとき、Zabを求めよ。</h2>
+      <figure id="problemFigure" class="problemFigure"><img id="problemImage" src="images/den1-001-y-delta.svg" width="900" height="590" loading="eager" alt="Y結線とΔ結線を並べた変換回路図"><figcaption>Y結線からΔ結線への変換</figcaption></figure>
       <div id="answerArea" class="answer hidden">
         <div class="divider"></div>
         <p class="answerLabel">正答</p><h3 id="answerText"></h3>
@@ -99,10 +106,11 @@
     </details>
 
     <details class="tools panel" id="manageTools"><summary>問題の追加・編集・削除・復元</summary>
-      <p class="small">この画面の変更は最初、この端末の下書きとして保存されます。「削除」は復元可能な保管、「完全削除」は復元不可です。全端末に反映するには更新した <code>questions.json</code> をダウンロードしてGitHubにアップロードしてください。</p>
+      <p class="small"><strong>ログイン中：</strong>このアカウントでの追加・編集・保管・削除はFirebaseでiPhone・iPad間に自動同期されます。<strong>未ログイン：</strong>端末内の下書きのみです。以前の端末下書きはログイン後に専用ボタンから移行してください。GitHubの公開問題そのものは変更しません。</p>
       <div class="inlineActions"><button id="addCard" type="button">＋ 新しい問題</button><button id="exportDeck" type="button">問題データを書き出す</button><label class="likeButton" for="importDeck">問題データを読み込む</label><input id="importDeck" type="file" accept=".json,application/json" class="visuallyHidden"><button id="discardDraft" class="danger" type="button">端末の下書きを破棄</button></div>
       <div class="manageStats"><span id="draftStatus">公開版を使用中</span><span id="archivedCount">保管中：0問</span></div>
       <label class="fullWidth">管理画面で問題を探す<input id="manageSearch" type="search" placeholder="ID・用語・問題文で検索"></label>
+      <p id="manageResultCount" class="small" aria-live="polite"></p>
       <div id="manageList" class="manageList"></div>
       <h3 class="subheading">削除済み（復元／完全削除）</h3>
       <div id="archiveList" class="manageList"></div>
@@ -110,19 +118,20 @@
         <h3 id="editorTitle">問題の追加</h3>
         <input id="editId" type="hidden">
         <label>分野<select id="editCategory" required></select></label>
-        <label>問題文<textarea id="editQuestion" rows="3" maxlength="2000" required></textarea></label>
-        <label>正答<textarea id="editAnswer" rows="2" maxlength="2000" required></textarea></label>
-        <label>解説<textarea id="editExplanation" rows="2" maxlength="4000"></textarea></label>
-        <label>試験対策ポイント<textarea id="editPoint" rows="2" maxlength="2000"></textarea></label>
-         <label>回路図のパス（images/内）<input id="editImage" type="text" placeholder="images/den1-001-y-delta.svg"></label>
-         <label>LaTeX数式（任意）<textarea id="editAnswerLatex" rows="2" placeholder="Z_{ab}=..."></textarea></label>
-         <label>出典<textarea id="editOrigin" rows="2"></textarea></label>
+        <label>問題文<textarea id="editQuestion" rows="3" maxlength="400" required></textarea></label>
+        <label>正答<textarea id="editAnswer" rows="2" maxlength="400" required></textarea></label>
+        <label>解説<textarea id="editExplanation" rows="2" maxlength="600"></textarea></label>
+        <label>試験対策ポイント<textarea id="editPoint" rows="2" maxlength="600"></textarea></label>
+         <label>回路図のパス（images/内）<input id="editImage" type="text" maxlength="200" placeholder="images/den1-001-y-delta.svg"></label>
+         <label>画像の説明（読み上げ用）<input id="editImageAlt" type="text" maxlength="200" placeholder="Y結線とΔ結線の変換図"></label>
+         <label>LaTeX数式（裏面・任意）<textarea id="editAnswerLatex" rows="2" maxlength="2000" placeholder="Z_{ab}=..."></textarea></label>
+         <label>出典<textarea id="editOrigin" rows="2" maxlength="1000"></textarea></label>
         <div class="inlineActions"><button type="submit">保存する</button><button type="button" class="quiet" id="cancelEdit">キャンセル</button></div>
         <p class="small">※答えの意味が大きく変わる場合、古い問題を削除し新規登録してください。既存成績を誤って引き継がないためです。</p>
       </form>
     </details>
   </section>
-  <footer class="footer">電験一種理論・過去問の論点から作成したカード。問題データはGitHub Pagesで共有。学習履歴はログイン時にFirebaseへ同期し、問題IDごとに保持。</footer>
+  <footer class="footer">電験一種理論・過去問の解法論点から作成した問題。GitHub Pagesは共通の問題データを公開し、ログイン中の個人用変更・学習記録・メモはFirebaseに保存します。</footer>
 </main>
 </body>
 </html>
