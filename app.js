@@ -279,6 +279,9 @@ function render(){
  $('progressBar').style.width=has?(100*(pool.indexOf(card.id)+1)/pool.length).toFixed(2)+'%':'0%';
  if(has){
    $('cardCategory').textContent=card.category;$('questionText').textContent=card.question;
+   const cardHistory=r(card.id);
+   $('cardCorrectCount').textContent=String(positive(cardHistory.correct));
+   $('cardWrongCount').textContent=String(positive(cardHistory.incorrect));
    $('questionText').classList.toggle('hidden',state.answerShown);
    const fig=$('problemFigure'),img=$('problemImage');
    const safePic=typeof card.image==='string'&&/^images\/[A-Za-z0-9._-]+\.(?:svg|png|jpg|jpeg|webp)$/i.test(card.image)&&!card.image.includes('..');
